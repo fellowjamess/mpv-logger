@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPV Media History</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .media-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .media-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+        .media-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .info-item {
+            color: #4a5568;
+        }
+        .info-label {
+            font-weight: 500;
+            color: #718096;
+        }
+        .timestamp {
+            color: #718096;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 30px;
+        }
+            .progress-container {
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        height: 20px;
+        width: 100%;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #4caf50;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>MPV Media History</h1>
+    {% for entry in entries %}
+    <div class="media-card">
+        <div class="media-title">{{ entry.title or entry.filename.split('/')[-1] }}</div>
+        <div class="media-info">
+            <div class="info-item">
+                <span class="info-label">Duration:</span>
+                {{ "%.2f"|format(entry.duration/60) if entry.duration else "N/A" }} minutes
+            </div>
+            <div class="info-item">
+                <span class="info-label">Format:</span>
+                {{ entry.format or "N/A" }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Video:</span>
+                {{ entry.video_format or "N/A" }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Audio:</span>
+                {{ entry.audio_codec or "N/A" }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Device:</span>
+                {{ entry.hostname or "N/A" }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">IP Address:</span>
+                {{ entry.ip_address or "N/A" }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Status:</span>
+                {{ entry.status or "N/A" }}
+            </div>
+
+            <div class="info-item">
+            <span class="info-label">Progress:</span>
+            <div class="progress-container">
+                {% if entry.duration and entry.total_duration and entry.total_duration > 0 %}
+                    {% set progress = (entry.duration / entry.total_duration * 100)|float %}
+                    {% if progress > 100 %}
+                        <div class="progress-bar" style="width: 100%"></div>
+                    {% else %}
+                        <div class="progress-bar" style="width: {{ progress|round(2) }}%"></div>
+                    {% endif %}
+                {% else %}
+                    <div class="progress-bar" style="width: 0%"></div>
+                {% endif %}
+            </div>
+            <span>
+                {% if entry.duration and entry.total_duration and entry.total_duration > 0 %}
+                    {% set progress = (entry.duration / entry.total_duration * 100)|float %}
+                    {% if progress > 100 %}
+                        100.00% played
+                    {% else %}
+                        {{ "%.2f"|format(progress) }}% played
+                    {% endif %}
+                {% else %}
+                    N/A
+                {% endif %}
+            </span>
+            </div>
+            <div class="timestamp">Watched on {{ entry.timestamp }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</body>
+</html>
